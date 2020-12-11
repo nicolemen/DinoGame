@@ -1,17 +1,40 @@
+//Need to Add: an example of object-oriented programming
+
+
 var dino = new Image();
-var canvas = document.getElementById('canvas');
-var context = canvas.getContext('2d');
+var ground = new Image();
+var cactus = new Image();
+var canvas = document.getElementById('mainCanvas');
+//var context = canvas.getContext('2d'); this gets repeated later on?
 
-dino.onload = function (){
-  context.drawImage(dino,50,50);
+
+
+dino.onload = function() {
+  context.drawImage(dino, 150, 300);
+  console.log('draw image');
 }
+dino.src = "dino.png";
 
-// this isn't working :CCCC
-dino.src = ‘dino.png';
+//var repeat = context.createPattern(ground,'repeat-x');
 
-var dinoPos = [50,100, 50, 50];
+ground.onload = function() {
+  context.drawImage(ground, 150, 350);
+  console.log('draw image');
+
+}
+ground.src = "ground.png";
+
+cactus.onload = function() {
+  context.drawImage(cactus, 450, 290);
+  console.log('draw image');
+}
+cactus.src = "cactus.png";
+
+var dinoPos = [150, 300, 50, 50];
 var dinoVel = [0, 0, 0, 0];
 
+var groundPos = [0,350,1118, 100];
+var groundVel = [0,0,0,0];
 
 function keyDown(event) {
   /*
@@ -26,26 +49,22 @@ function keyDown(event) {
   console.log(keyStr);
 
   if (keyStr == 'ArrowUp' || keyStr == ' ') {
-// dino.jump();
-    dinoPos[1] += dinoVel[1];
-
-    if (dinoPos[1] <= 85){
-      dinoVel += 1;
-    }
-    if(dinoPos[1] >= 100){
-      dinoVel -= 1;
+    // dino.jump();
+    if (dinoPos[1] >= 300) {
+      dinoVel[1] = -1;
     }
   }
-  dinoPos[1] += dinoVel[1];
+
+
 }
 
 //function jump() {
-  /*
-  Parameters: none, because it relies on user input with pressing keys
-  Returns: none, but it will change global variables
-  Purpose: makes the dinosaur look like it's jumping
-  */
-  // set upper height and then switch velocity
+/*
+Parameters: none, because it relies on user input with pressing keys
+Returns: none, but it will change global variables
+Purpose: makes the dinosaur look like it's jumping
+*/
+// set upper height and then switch velocity
 
 //}
 
@@ -56,11 +75,29 @@ function drawAll() {
     Purpose: the main drawing loop
   */
 
+  if (dinoPos[1] <= 225) {
+    dinoVel[1] = 1;
+  }
+  if (dinoPos[1] > 300) {
+    dinoPos[1] = 300;
+    dinoVel[1] = 0;
+  }
+  dinoPos[1] += dinoVel[1];
+
+  if (groundPos[0] >= 0){
+    groundVel[2] = -1;
+  }
+  groundPos[0] += groundVel[2];
 
 
-  jump();
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(dino, dinoPos[0], dinoPos[1]);
+  context.drawImage(ground, groundPos[0], groundPos[1]);
+  context.drawImage(cactus, 450, 290);
 
-
+  //context.rect(0,350,1118,100);
+  //context.fillStyle = repeat;
+  //context.fill();
   // loop
   window.requestAnimationFrame(drawAll);
 }
