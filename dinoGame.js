@@ -1,5 +1,5 @@
-//Need to Add: an example of object-oriented programming
-
+//Need to Add: a class for dino? with setters and getters?
+// dino collision
 
 var dino = new Image();
 var ground = new Image();
@@ -7,34 +7,38 @@ var cactus = new Image();
 var canvas = document.getElementById('mainCanvas');
 //var context = canvas.getContext('2d'); this gets repeated later on?
 
-
-
 dino.onload = function() {
-  context.drawImage(dino, 150, 300);
-  console.log('draw image');
+  context.drawImage(dino, 150, 310);
 }
 dino.src = "dino.png";
 
-//var repeat = context.createPattern(ground,'repeat-x');
 
 ground.onload = function() {
   context.drawImage(ground, 150, 350);
-  console.log('draw image');
-
 }
 ground.src = "ground.png";
 
 cactus.onload = function() {
   context.drawImage(cactus, 450, 290);
-  console.log('draw image');
 }
 cactus.src = "cactus.png";
 
-var dinoPos = [150, 300, 50, 50];
+var dinoPos = [150, 310, 24, 24];
 var dinoVel = [0, 0, 0, 0];
 
-var groundPos = [0,350,1118, 100];
-var groundVel = [0,0,0,0];
+var groundPos = [0, 350, 2404, 28];
+var groundVel = [0, 0, 0, 0];
+
+var cactusPos = [0, 0, 36, 73];
+var cactusVel = [0, 0, 0, 0];
+
+class Dino{
+  constructor(posX, posY){
+      this.posX = posX;
+      this.posY = posY;
+  }
+  //
+}
 
 function keyDown(event) {
   /*
@@ -51,10 +55,14 @@ function keyDown(event) {
   if (keyStr == 'ArrowUp' || keyStr == ' ') {
     // dino.jump();
     if (dinoPos[1] >= 300) {
-      dinoVel[1] = -1;
+      dinoVel[1] = -2;
     }
   }
 
+  if (keyStr == 'b'){
+    console.log(dinoPos);
+    console.log(cactusPos);
+  }
 
 }
 
@@ -75,29 +83,46 @@ function drawAll() {
     Purpose: the main drawing loop
   */
 
-  if (dinoPos[1] <= 225) {
-    dinoVel[1] = 1;
+  if (dinoPos[1] <= 220) {
+    dinoVel[1] = 2;
   }
-  if (dinoPos[1] > 300) {
-    dinoPos[1] = 300;
+  if (dinoPos[1] > 310) {
+    dinoPos[1] = 310;
     dinoVel[1] = 0;
   }
   dinoPos[1] += dinoVel[1];
 
-  if (groundPos[0] >= 0){
-    groundVel[2] = -1;
+  if (groundPos[0] >= 0) {
+    groundVel[2] = -2;
   }
   groundPos[0] += groundVel[2];
 
 
+  if (cactusPos[0] >= 0) {
+    cactusVel[2] = -2;
+  }
+  cactusPos[0] += cactusVel[2];
+
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.drawImage(dino, dinoPos[0], dinoPos[1]);
-  context.drawImage(ground, groundPos[0], groundPos[1]);
-  context.drawImage(cactus, 450, 290);
 
-  //context.rect(0,350,1118,100);
-  //context.fillStyle = repeat;
-  //context.fill();
+  if (groundPos[0] > -1000) {
+    context.drawImage(ground, groundPos[0], groundPos[1]);
+  } else {
+    groundPos[0] += 1000;
+  }
+
+  if ((Math.random() < 0.01) && (cactusPos[0] <= dinoPos[0])) {
+    cactusPos[0] = canvas.width + Math.floor(Math.random() * 100);
+  }
+  context.drawImage(cactus, cactusPos[0], 290);
+
+  if ((dinoPos[0] + dinoPos[2] >= cactusPos[0]) && (dinoPos[1] + dinoPos[3] >= 290) && (dinoPos[0] + dinoPos[2] <= cactusPos[0] + 24)) {
+    console.log(dinoPos, cactusPos);
+    alert("GAME OVER");
+    document.location.reload();
+    clearInterval(interval);
+  }
   // loop
   window.requestAnimationFrame(drawAll);
 }
