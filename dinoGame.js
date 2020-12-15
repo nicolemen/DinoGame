@@ -1,17 +1,18 @@
-//Need to Add: a class for dino? with setters and getters?
-// dino collision
+// Welcome to my recreation of the Google dinosaur game!
 
-var dino = new Image();
+// initializing variables and the sprite images they correspond to
+var dinosaur = new Image();
 var ground = new Image();
 var cactus = new Image();
+
+// setting up canvas
 var canvas = document.getElementById('mainCanvas');
-//var context = canvas.getContext('2d'); this gets repeated later on?
 
-dino.onload = function() {
-  context.drawImage(dino, 150, 310);
+// loading all the images of the dinosaur, ground, and cactus
+dinosaur.onload = function() {
+  context.drawImage(dinosaur, 150, 310);
 }
-dino.src = "dino.png";
-
+dinosaur.src = "dino.png";
 
 ground.onload = function() {
   context.drawImage(ground, 150, 350);
@@ -23,6 +24,7 @@ cactus.onload = function() {
 }
 cactus.src = "cactus.png";
 
+// setting values for the variables in list form for both position and velocity
 var dinoPos = [150, 310, 24, 24];
 var dinoVel = [0, 0, 0, 0];
 
@@ -32,13 +34,28 @@ var groundVel = [0, 0, 0, 0];
 var cactusPos = [0, 0, 36, 73];
 var cactusVel = [0, 0, 0, 0];
 
-class Dino{
-  constructor(posX, posY){
-      this.posX = posX;
-      this.posY = posY;
+// creating a Dino class for dino-related methods
+class Dino {
+  constructor(posY, velY) {
+    // initializing variables again for this class
+    this.posY = posY;
+    this.velY = velY;
   }
-  //
+
+  jump() {
+    /*
+    Parameters: none, because it relies on user input with pressing keys to be called on
+    Returns: none, but it will change variables
+    Purpose: makes the dinosaur look like it's jumping
+    */
+    if (this.posY >= 300) {
+      this.velY = -2;
+    }
+  }
 }
+
+// an instance of the dino
+let dino = new Dino(310, 0);
 
 function keyDown(event) {
   /*
@@ -48,33 +65,12 @@ function keyDown(event) {
   */
   keyCode = event.which;
   keyStr = event.key;
-  console.log(event);
-  console.log(keyCode);
-  console.log(keyStr);
 
+  // set the space bar and the up arrow key to trigger the jump method
   if (keyStr == 'ArrowUp' || keyStr == ' ') {
-    // dino.jump();
-    if (dinoPos[1] >= 300) {
-      dinoVel[1] = -2;
-    }
+    dino.jump();
   }
-
-  if (keyStr == 'b'){
-    console.log(dinoPos);
-    console.log(cactusPos);
-  }
-
 }
-
-//function jump() {
-/*
-Parameters: none, because it relies on user input with pressing keys
-Returns: none, but it will change global variables
-Purpose: makes the dinosaur look like it's jumping
-*/
-// set upper height and then switch velocity
-
-//}
 
 function drawAll() {
   /*
@@ -83,41 +79,44 @@ function drawAll() {
     Purpose: the main drawing loop
   */
 
-  if (dinoPos[1] <= 220) {
-    dinoVel[1] = 2;
+  // makes the dinosaur travel back to the ground due to "gravity"
+  if (dino.posY <= 220) {
+    dino.velY = 2;
   }
-  if (dinoPos[1] > 310) {
-    dinoPos[1] = 310;
-    dinoVel[1] = 0;
+  if (dino.posY > 310) {
+    dino.posY = 310;
+    dino.velY = 0;
   }
-  dinoPos[1] += dinoVel[1];
+  dino.posY += dino.velY;
 
+  // ground and cactithat moves to the left of the screen
   if (groundPos[0] >= 0) {
     groundVel[2] = -2;
   }
   groundPos[0] += groundVel[2];
-
 
   if (cactusPos[0] >= 0) {
     cactusVel[2] = -2;
   }
   cactusPos[0] += cactusVel[2];
 
+  // draws the dinosaur on the canvas
   context.clearRect(0, 0, canvas.width, canvas.height);
-  context.drawImage(dino, dinoPos[0], dinoPos[1]);
+  context.drawImage(dinosaur, dinoPos[0], dino.posY);
 
+  // draws the ground in a continuous motion
   if (groundPos[0] > -1000) {
     context.drawImage(ground, groundPos[0], groundPos[1]);
   } else {
     groundPos[0] += 1000;
   }
-
+  // randomly generates cacti that come from the right side of the screen
   if ((Math.random() < 0.01) && (cactusPos[0] <= dinoPos[0])) {
     cactusPos[0] = canvas.width + Math.floor(Math.random() * 100);
   }
   context.drawImage(cactus, cactusPos[0], 290);
-
-  if ((dinoPos[0] + dinoPos[2] >= cactusPos[0]) && (dinoPos[1] + dinoPos[3] >= 290) && (dinoPos[0] + dinoPos[2] <= cactusPos[0] + 24)) {
+  // detects collisions between cacti and dinosaur and declares "Game Over"
+  if ((dinoPos[0] + dinoPos[2] >= cactusPos[0]) && (dino.posY + dinoPos[3] >= 290) && (dinoPos[0] + dinoPos[2] <= cactusPos[0] + 24)) {
     console.log(dinoPos, cactusPos);
     alert("GAME OVER");
     document.location.reload();
@@ -128,24 +127,24 @@ function drawAll() {
 }
 
 
-// Get width/height of the browser window
+// get width/height of the browser window
 windowWidth = window.innerWidth;
 windowHeight = window.innerHeight;
 console.log("Window is %d by %d", windowWidth, windowHeight);
 
-// Get the canvas, set the width and height from the window
+// get canvas, and set the width and height from the window
 canvas = document.getElementById("mainCanvas");
 
+// set dimensions and border of the canvas
 canvas.width = windowWidth - 20;
 canvas.height = windowHeight - 20;
 canvas.style.border = "1px solid black";
 
-// Set up the context for the animation
+// set up the context for the animation
 context = canvas.getContext("2d");
 
-// Set up event listener for when user presses a key down.
-// It then calls the function keyDown, passing it an event object.
+// set up event listener for when user presses a key
 document.addEventListener("keydown", keyDown);
 
-// Fire up the animation engine
+// animation engine
 window.requestAnimationFrame(drawAll);
