@@ -25,9 +25,6 @@ cactus.onload = function() {
 cactus.src = "cactus.png";
 
 // setting values for the variables in list form for both position and velocity
-var dinoPos = [150, 310, 24, 24];
-var dinoVel = [0, 0, 0, 0];
-
 var groundPos = [0, 350, 2404, 28];
 var groundVel = [0, 0, 0, 0];
 
@@ -36,9 +33,12 @@ var cactusVel = [0, 0, 0, 0];
 
 // creating a Dino class for dino-related methods
 class Dino {
-  constructor(posY, velY) {
+  constructor(posX, posY, widthX, widthY, velY) {
     // initializing variables again for this class
+    this.posX = posX;
     this.posY = posY;
+    this.widthX = widthX;
+    this.widthY = widthY;
     this.velY = velY;
   }
 
@@ -52,10 +52,22 @@ class Dino {
       this.velY = -2;
     }
   }
+  detectCollision() {
+    /*
+    Parameters: none
+    Returns: will cause the game to end with a "Game Over" message
+    Purpose: ends the game
+    */
+    if ((this.posX + this.widthX >= cactusPos[0]) && (this.posY + this.widthY >= 290) && (this.posX + this.widthX <= cactusPos[0] + 24)) {
+      alert("GAME OVER");
+      document.location.reload();
+      clearInterval(interval);
+    }
+  }
 }
 
 // an instance of the dino
-let dino = new Dino(310, 0);
+let dino = new Dino(150, 310, 24, 24, 0);
 
 function keyDown(event) {
   /*
@@ -102,7 +114,7 @@ function drawAll() {
 
   // draws the dinosaur on the canvas
   context.clearRect(0, 0, canvas.width, canvas.height);
-  context.drawImage(dinosaur, dinoPos[0], dino.posY);
+  context.drawImage(dinosaur, dino.posX, dino.posY);
 
   // draws the ground in a continuous motion
   if (groundPos[0] > -1000) {
@@ -111,17 +123,14 @@ function drawAll() {
     groundPos[0] += 1000;
   }
   // randomly generates cacti that come from the right side of the screen
-  if ((Math.random() < 0.01) && (cactusPos[0] <= dinoPos[0])) {
+  if ((Math.random() < 0.01) && (cactusPos[0] <= dino.posX)) {
     cactusPos[0] = canvas.width + Math.floor(Math.random() * 100);
   }
   context.drawImage(cactus, cactusPos[0], 290);
-  // detects collisions between cacti and dinosaur and declares "Game Over"
-  if ((dinoPos[0] + dinoPos[2] >= cactusPos[0]) && (dino.posY + dinoPos[3] >= 290) && (dinoPos[0] + dinoPos[2] <= cactusPos[0] + 24)) {
-    console.log(dinoPos, cactusPos);
-    alert("GAME OVER");
-    document.location.reload();
-    clearInterval(interval);
-  }
+
+  // calls on the method so the game will end when dino collides with cactus
+  dino.detectCollision();
+
   // loop
   window.requestAnimationFrame(drawAll);
 }
@@ -130,7 +139,6 @@ function drawAll() {
 // get width/height of the browser window
 windowWidth = window.innerWidth;
 windowHeight = window.innerHeight;
-console.log("Window is %d by %d", windowWidth, windowHeight);
 
 // get canvas, and set the width and height from the window
 canvas = document.getElementById("mainCanvas");
